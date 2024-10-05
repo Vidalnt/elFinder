@@ -237,7 +237,7 @@ task({'elfinder': ['clean', 'prebuild', 'css/elfinder.min.css', 'js/elfinder.min
 
 desc('start server');
 task({'serve':['elfinder']}, function () {
-	jake.exec(['python3 -m http.server 9876'], {interactive: true, printStdout: true, printStderr: true}, function () {
+	jake.exec(['python -m http.server 9876'], {interactive: true, printStdout: true, printStderr: true}, function () {
 		console.log('Server started');
 		complete();
 	});
@@ -247,6 +247,7 @@ desc('minimal build elFinder');
 task({'elfinder-minimal': ['clean', 'prebuild', 'css/elfinder.min.css', 'js/elfinder-minimal.min.js', 'misc-minimal']}, function(){
 	console.log('elFinder prebuild done');
 });
+
 
 // CSS
 desc('concat elfinder.full.css');
@@ -341,14 +342,14 @@ file({'js/elfinder-minimal.full.js': files['elfinder-minimal.full.js']}, functio
 desc('uglify elfinder.min.js');
 file({'js/elfinder.min.js': ['js/elfinder.full.js']}, function () {
 	console.log('uglify elfinder.min.js');
-	var result = ugjs.minify(fs.readFileSync('js/elfinder.full.js').toString()).code;
+	var result = ugjs.minify(fs.readFileSync('js/elfinder.full.js')).code;
 	fs.writeFileSync(this.name, buildComment() + result);
 });
 
 desc('uglify elfinder-minimal.min.js');
 file({'js/elfinder-minimal.min.js': ['js/elfinder-minimal.full.js']}, function () {
 	console.log('uglify elfinder-minimal.min.js');
-	var result = ugjs.minify(fs.readFileSync('js/elfinder-minimal.full.js').toString()).code;
+	var result = ugjs.minify(fs.readFileSync('js/elfinder-minimal.full.js')).code;
 	fs.writeFileSync(this.name, buildComment() + result);
 });
 
@@ -363,9 +364,9 @@ task('misc', function(){
 		.concat(files['php'])
 		.concat(files['misc'])
 		.concat(path.join(src, 'files', '.gitignore'))
-		.concat(path.join(src, 'files', '.trash', '.gitignore'))
 		.concat(path.join(src, 'package.json'))
-		.concat(path.join(src, '__init__.py'));
+		.concat(path.join(src, '__init__.py'))
+		.concat(path.join(src, 'files', '.trash', '.gitignore'));
 	for (i in cf)
 	{
 		var dst = cf[i].replace(src, '').substr(1);
@@ -402,19 +403,27 @@ task('misc-minimal', function(){
 });
 
 desc('uglify js/extras');
-task('js/extras', function(){
-	var files = grep(path.join(src, 'js', 'extras'), '\\.js$');
-	var base, name, result;
-	for (var i in files) {
-		name = files[i].replace(/^.+\/([^\/]+)$/, '$1');
-		if (! name.match(/\.min\./)) {
-			base = name.replace(/\.js$/, '');
-			name = 'js/extras/' + name;
-			console.log('uglify ' + name);
-			var result = ugjs.minify(fs.readFileSync(files[i]).toString()).code;
-			fs.writeFileSync('js/extras/' + base + '.min.js', result);
-		}
-	}
+task('js/extras', function () {
+    const src = 'src'; 
+    const files = grep(path.join(src, 'js', 'extras'), '\\.js$');
+    let base, name, result, filePath;
+
+    for (const file of files) {
+        name = file.replace(/^.+\/([^\/]+)$/, '$1');
+        if (!name.match(/\.min\./)) {
+            base = name.replace(/\.js$/, '');
+            filePath = file.replace(src, '').replace(/^\//, '');
+            filePath = path.join('js', 'extras', `${base}.min.js`);
+
+            console.log('uglify ' + name);
+            try {
+                result = ugjs.minify(fs.readFileSync(file, 'utf8')).code;
+                fs.writeFileSync(filePath, result);
+            } catch (error) {
+                console.error(`Error al minimizar ${file}:`, error);
+            }
+        }
+    }
 });
 
 // other
