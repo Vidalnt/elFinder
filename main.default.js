@@ -7,8 +7,8 @@
 (function(){
 	"use strict";
 	var // jQuery and jQueryUI version
-		jqver = '3.6.0',
-		uiver = '1.12.1',
+		jqver = '3.7.1',
+		uiver = '1.13.2',
 		
 		// Detect language (optional)
 		lang = (function() {
@@ -46,8 +46,8 @@
 		// Start elFinder (REQUIRED)
 		start = function(elFinder, editors, config) {
 			// load jQueryUI CSS
-			elFinder.prototype.loadCss('https://cdnjs.cloudflare.com/ajax/libs/jqueryui/'+uiver+'/themes/smoothness/jquery-ui.css');
-
+			elFinder.prototype.loadCss('//cdnjs.cloudflare.com/ajax/libs/jqueryui/'+uiver+'/themes/smoothness/jquery-ui.css');
+			
 			$(function() {
 				var optEditors = {
 						commandsOptions: {
@@ -104,7 +104,7 @@
 			require(
 				[
 					'elfinder'
-					, 'editors'               // load text, image editors
+					, 'extras/editors.default.min'               // load text, image editors
 					, 'elFinderConfig'
 				//	, 'extras/quicklook.googledocs.min'          // optional preview for GoogleApps contents on the GoogleDrive volume
 				],
@@ -124,11 +124,9 @@
 	require.config({
 		baseUrl : 'js',
 		paths : {
-			'jquery'   : 'https://cdnjs.cloudflare.com/ajax/libs/jquery/'+(old? '1.12.4' : jqver)+'/jquery.min',
-			'jquery-ui': 'https://cdnjs.cloudflare.com/ajax/libs/jqueryui/'+uiver+'/jquery-ui.min',
-			'elfinder' : 'elfinder.full',
-			'editors': 'extras/editors.default',
-			'imjoyLoader': 'https://lib.imjoy.io/imjoy-loader',
+			'jquery'   : '//cdnjs.cloudflare.com/ajax/libs/jquery/'+(old? '1.12.4' : jqver)+'/jquery.min',
+			'jquery-ui': '//cdnjs.cloudflare.com/ajax/libs/jqueryui/'+uiver+'/jquery-ui.min',
+			'elfinder' : 'elfinder.min',
 			'encoding-japanese': '//cdn.rawgit.com/polygonplanet/encoding.js/1.0.26/encoding.min'
 		},
 		waitSeconds : 10 // optional
@@ -170,6 +168,7 @@
 			}
 		});
 	}
+
 	window.initializeServiceWorker().then(() => {
 		// Remove the spinner once the service worker is ready
 		document.getElementById('spinner').style.display = 'none';
