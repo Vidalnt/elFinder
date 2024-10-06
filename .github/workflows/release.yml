@@ -29,7 +29,7 @@ jobs:
           make clean
           python setup.py sdist
           echo "Waiting for tar.gz to be created..."
-          until [ -f "./dist/imjoy-elfinder-${{ github.event.release.tag_name }}.tar.gz" ]; do
+          until [ -f "./dist/imjoy_elfinder-${{ github.event.release.tag_name }}.tar.gz" ]; do
             sleep 5
           done
           echo "tar.gz file found!"
@@ -39,6 +39,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./dist/imjoy-elfinder-${{ github.event.tag_name }}.tar.gz
-          asset_name: imjoy-elfinder-${{ github.event.tag_name }}.tar.gz
+          asset_path: ./dist/imjoy_elfinder-${{ github.event.tag_name }}.tar.gz
+          asset_name: imjoy_elfinder-${{ github.event.tag_name }}.tar.gz
           asset_content_type: application/gzip
