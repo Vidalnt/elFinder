@@ -28,7 +28,13 @@ jobs:
         run: |
           make clean
           make build
-          
+      - name: Wait for tar.gz to exist
+        run: |
+          echo "Waiting for tar.gz to be created..."
+          until [ -f "./dist/imjoy-elfinder-${{ github.event.release.tag_name }}.tar.gz" ]; do
+            sleep 5
+          done
+          echo "tar.gz file found!"
       - name: Upload Release Asset sdist
         uses: actions/upload-release-asset@v1
         env:
