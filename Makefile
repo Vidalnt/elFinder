@@ -7,7 +7,7 @@ help:
 	@echo "clean-pyc - remove Python file artifacts"
 
 build:
-	python setup.py sdist bdist_wheel
+	python setup.py sdist
 
 clean: clean-build clean-pyc
 
