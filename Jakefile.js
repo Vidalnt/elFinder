@@ -237,7 +237,7 @@ task({'elfinder': ['clean', 'prebuild', 'css/elfinder.min.css', 'js/elfinder.min
 
 desc('start server');
 task({'serve':['elfinder']}, function () {
-	jake.exec(['python -m http.server 9876'], {interactive: true, printStdout: true, printStderr: true}, function () {
+	jake.exec(['python3 -m http.server 9876'], {interactive: true, printStdout: true, printStderr: true}, function () {
 		console.log('Server started');
 		complete();
 	});
@@ -247,7 +247,6 @@ desc('minimal build elFinder');
 task({'elfinder-minimal': ['clean', 'prebuild', 'css/elfinder.min.css', 'js/elfinder-minimal.min.js', 'misc-minimal']}, function(){
 	console.log('elFinder prebuild done');
 });
-
 
 // CSS
 desc('concat elfinder.full.css');
@@ -342,34 +341,14 @@ file({'js/elfinder-minimal.full.js': files['elfinder-minimal.full.js']}, functio
 desc('uglify elfinder.min.js');
 file({'js/elfinder.min.js': ['js/elfinder.full.js']}, function () {
 	console.log('uglify elfinder.min.js');
-	var result;
-	if (typeof ugjs.minify == 'undefined') {
-		var ugp  = ugjs.parser;
-		var ugu  = ugjs.uglify;
-		var ast = ugp.parse(fs.readFileSync('js/elfinder.full.js').toString()); // parse code and get the initial AST
-		ast = ugu.ast_mangle(ast); // get a new AST with mangled names
-		ast = ugu.ast_squeeze(ast); // get an AST with compression optimizations
-		result = ugu.split_lines(ugu.gen_code(ast), 1024 * 8); // insert new line every 8 kb
-	} else {
-		result = ugjs.minify('js/elfinder.full.js').code;
-	}
+	var result = ugjs.minify(fs.readFileSync('js/elfinder.full.js').toString()).code;
 	fs.writeFileSync(this.name, buildComment() + result);
 });
 
 desc('uglify elfinder-minimal.min.js');
 file({'js/elfinder-minimal.min.js': ['js/elfinder-minimal.full.js']}, function () {
 	console.log('uglify elfinder-minimal.min.js');
-	var result;
-	if (typeof ugjs.minify == 'undefined') {
-		var ugp  = ugjs.parser;
-		var ugu  = ugjs.uglify;
-		var ast = ugp.parse(fs.readFileSync('js/elfinder-minimal.full.js').toString()); // parse code and get the initial AST
-		ast = ugu.ast_mangle(ast); // get a new AST with mangled names
-		ast = ugu.ast_squeeze(ast); // get an AST with compression optimizations
-		result = ugu.split_lines(ugu.gen_code(ast), 1024 * 8); // insert new line every 8 kb
-	} else {
-		result = ugjs.minify('js/elfinder-minimal.full.js').code;
-	}
+	var result = ugjs.minify(fs.readFileSync('js/elfinder-minimal.full.js').toString()).code;
 	fs.writeFileSync(this.name, buildComment() + result);
 });
 
@@ -384,9 +363,9 @@ task('misc', function(){
 		.concat(files['php'])
 		.concat(files['misc'])
 		.concat(path.join(src, 'files', '.gitignore'))
+		.concat(path.join(src, 'files', '.trash', '.gitignore'))
 		.concat(path.join(src, 'package.json'))
-		.concat(path.join(src, '__init__.py'))
-		.concat(path.join(src, 'files', '.trash', '.gitignore'));
+		.concat(path.join(src, '__init__.py'));
 	for (i in cf)
 	{
 		var dst = cf[i].replace(src, '').substr(1);
@@ -425,7 +404,7 @@ task('misc-minimal', function(){
 desc('uglify js/extras');
 task('js/extras', function(){
 	var files = grep(path.join(src, 'js', 'extras'), '\\.js$');
-	var base, name, result, filePath;
+	var base, name;
 	for (var i in files) {
 		name = files[i].replace(/^.+\/([^\/]+)$/, '$1');
 		if (! name.match(/\.min\./)) {
@@ -433,16 +412,8 @@ task('js/extras', function(){
 			base = name.replace(/\.js$/, '');
 			name = path.join('js', 'extras', `${base}.min.js`); 
 			console.log('uglify ' + name);
-			if (typeof ugjs.minify == 'undefined') {
-				var ugp  = ugjs.parser;
-				var ugu  = ugjs.uglify;
-				var ast = ugp.parse(fs.readFileSync(files[i]).toString()); // parse code and get the initial AST
-				ast = ugu.ast_mangle(ast); // get a new AST with mangled names
-				ast = ugu.ast_squeeze(ast); // get an AST with compression optimizations
-				result = ugu.split_lines(ugu.gen_code(ast), 1024 * 8); // insert new line every 8 kb
-			} else {
-				result = ugjs.minify(fs.readFileSync(files[i], 'utf8')).code;
-			}
+			var result = ugjs.minify(fs.readFileSync(files[i], 'utf8')).code;
+			
 			fs.writeFileSync('js/extras/' + base + '.min.js', result);
 		}
 	}
