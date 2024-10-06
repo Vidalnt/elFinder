@@ -28,11 +28,7 @@ jobs:
         run: |
           make clean
           python setup.py sdist
-          echo "Waiting for tar.gz to be created..."
-          until [ -f "./dist/imjoy_elfinder-${{ github.event.release.tag_name }}.tar.gz" ]; do
-            sleep 5
-          done
-          echo "tar.gz file found!"
+          ls -l ./dist
       - name: Upload Release Asset sdist
         uses: actions/upload-release-asset@v1
         env:
