@@ -35,6 +35,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./dist/imjoy_elfinder-${{ github.event.tag_name }}.tar.gz
-          asset_name: imjoy_elfinder-${{ github.event.tag_name }}.tar.gz
+          asset_path: ./dist/elfinder-client-${{ github.event.release.tag_name }}.tar.gz
+          asset_name: elfinder-client-${{ github.event.release.tag_name }}.tar.gz
           asset_content_type: application/gzip
